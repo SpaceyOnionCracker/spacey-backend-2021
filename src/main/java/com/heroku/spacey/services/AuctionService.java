@@ -17,4 +17,6 @@ public interface AuctionService {
     void update(AuctionDto auctionDto, Long id);
 
     void remove(Long id);
+
+    void updateBid(AuctionDto auctionDto, Double bid);
 }

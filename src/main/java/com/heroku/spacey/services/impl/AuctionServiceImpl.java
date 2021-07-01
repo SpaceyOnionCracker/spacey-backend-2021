@@ -4,10 +4,12 @@ import com.heroku.spacey.dao.AuctionDao;
 import com.heroku.spacey.dto.auction.AuctionDto;
 import com.heroku.spacey.dto.auction.AllAuctionsDto;
 import com.heroku.spacey.entity.Auction;
+import com.heroku.spacey.entity.User;
 import com.heroku.spacey.services.AuctionService;
 import com.heroku.spacey.utils.convertors.AuctionConvertor;
 import com.heroku.spacey.utils.convertors.CommonConvertor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
@@ -73,4 +75,28 @@ public class AuctionServiceImpl implements AuctionService {
         }
         auctionDao.delete(id);
     }
+
+    @Override
+    public void updateBid(AuctionDto auctionDto, Double bid) {
+        int i = auctionDto.getAuctionType() == Boolean.TRUE ? 1 : -1;
+        boolean isPriceStepCorrect;
+        if (auctionDto.getBuyPrice() != 0) {
+            isPriceStepCorrect = i * bid - i * auctionDto.getBuyPrice() >= auctionDto.getPriceStep();
+        } else {
+            isPriceStepCorrect = i * bid - i * auctionDto.getStartPrice() >= auctionDto.getPriceStep();
+        }
+        if (!isPriceStepCorrect) {
+            throw new IllegalArgumentException("Incorrect bid");
+        }
+
+        Object principal = SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        User user = (User) principal;
+        auctionDto.setUserId(user.getUserId());
+        auctionDto.setBuyPrice(bid);
+        //TODO: update bid
+        auctionDao.updateBid(auctionDto);
+    }
+
+
 }

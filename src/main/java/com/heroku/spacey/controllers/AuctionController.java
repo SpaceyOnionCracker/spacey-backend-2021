@@ -54,4 +54,13 @@ public class AuctionController {
         auctionService.remove(auction.getAuctionId());
         return HttpStatus.ACCEPTED;
     }
+
+    @PostMapping("/update/{id}")
+    @Secured("ROLE_USER")
+    public HttpStatus updateAuctionBid(@PathVariable Long id,
+                                       @RequestParam Double bid) {
+        AuctionDto auction = auctionService.getById(id);
+        auctionService.updateBid(auction, bid);
+        return HttpStatus.ACCEPTED;
+    }
 }
