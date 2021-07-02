@@ -74,10 +74,10 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public List<CourierOrdersDto> getCourierOrders(Long orderId, Date date) {
+    public List<CourierOrdersDto> getCourierOrders(Long userId, Date date) {
         LocalDateTime startOfDay = date.toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1);
 
-        return jdbcTemplate.query(getCourierOrders, courierOrdersMapper, orderId, startOfDay, endOfDay);
+        return jdbcTemplate.query(getCourierOrders, courierOrdersMapper, userId, startOfDay, endOfDay);
     }
 }
