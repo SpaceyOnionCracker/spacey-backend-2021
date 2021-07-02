@@ -11,6 +11,7 @@ import java.util.List;
 public class AuctionProductDto {
     private Long id;
     private String name;
+    private String photo;
     private String description;
     private String productSex;
     private CategoryDto productCategory;
