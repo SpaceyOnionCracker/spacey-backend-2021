@@ -6,7 +6,7 @@ import com.heroku.spacey.dto.order.OrderStatusDto;
 import java.sql.SQLException;
 
 public interface OrderDetailsDao {
-    OrderDetailsDto getOrderDetails(Long orderId) throws SQLException;
+    OrderDetailsDto getOrderDetails(Long orderId, Long userId) throws SQLException;
 
     void updateOrderStatus(OrderStatusDto orderStatusDto);
 
