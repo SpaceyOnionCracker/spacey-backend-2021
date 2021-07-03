@@ -96,7 +96,7 @@ public class AuthController {
         return HttpStatus.OK;
     }
 
-    @GetMapping("/resend_registration_token")
+    @GetMapping("/resend-registration-token")
     public HttpStatus resendRegistrationToken(@RequestParam("token") String existingToken) {
         User user = userService.getUserByToken(existingToken);
         Token newToken = tokenService.generateNewVerificationToken(user, existingToken);
@@ -112,7 +112,7 @@ public class AuthController {
         return HttpStatus.OK;
     }
 
-    @PostMapping("/reset_password")
+    @PostMapping("/reset-password")
     public HttpStatus resetPassword(@RequestParam("email") String userEmail) {
         EmailComposer emailComposer = new EmailComposer(
             resetPasswordUrl,
@@ -127,7 +127,7 @@ public class AuthController {
         return HttpStatus.OK;
     }
 
-    @GetMapping("/reset_password_confirm")
+    @GetMapping("/reset-password-confirm")
     public HttpStatus showResetPasswordPage(@RequestParam("token") String token) throws TimeoutException {
         String tokenValidation = passwordService.validatePasswordResetToken(token);
         if (tokenValidation == null) {
@@ -146,7 +146,7 @@ public class AuthController {
         return HttpStatus.OK;
     }
 
-    @PostMapping("/reset_password_save")
+    @PostMapping("/reset-password-save")
     public HttpStatus saveResetPassword(@RequestBody @Validated ResetPasswordDto resetPasswordDto) {
         User user = userService.getUserByEmail(resetPasswordDto.getEmail());
         if (user == null) {
@@ -168,7 +168,7 @@ public class AuthController {
         return HttpStatus.OK;
     }
 
-    @PostMapping("/change_password_save")
+    @PostMapping("/change-password-save")
     public HttpStatus saveChangePassword(@RequestBody @Validated PasswordDto passwordDto) {
         User user = userService.getUserByEmail(passwordDto.getEmail());
         if (user == null) {
