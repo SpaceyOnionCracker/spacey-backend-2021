@@ -34,6 +34,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
+    private static final long ONE_HOUR_IN_MILLISECONDS = 3_600_000;
+
     private final OrderDao orderDao;
     private final ProductDao productDao;
     private final EmployeeDao employeeDao;
@@ -90,10 +92,10 @@ public class OrderServiceImpl implements OrderService {
     private void setOrderComment(CreateOrderDto order) {
         StringBuilder commentOptions = new StringBuilder(order.getCommentOrder());
         if (order.isDoNotDisturb()) {
-            commentOptions.append("\nDo not disturb me, please.");
+            commentOptions.append("${dndMessage}");
         }
         if (order.isNoContact()) {
-            commentOptions.append("\nI want this to be a 'no contact' delivery.");
+            commentOptions.append("${noContactMessage}");
         }
         order.setCommentOrder(commentOptions.toString());
     }
@@ -169,11 +171,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void scheduleOrderStatusChange(CreateOrderDto order) {
-        // TODO: remove magic numbers
-        long timeToStatusChange = order.getDateDelivery().getTime() - 3_600_000 - System.currentTimeMillis();
+        long timeToStatusChange = order.getDateDelivery().getTime()
+                                  - ONE_HOUR_IN_MILLISECONDS
+                                  - System.currentTimeMillis();
 
         if (timeToStatusChange <= 0) {
-            timeToStatusChange = 1000;
+            timeToStatusChange = 1;
         }
 
         taskScheduler.scheduleAtFixedRate(
