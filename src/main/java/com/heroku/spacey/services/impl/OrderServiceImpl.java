@@ -1,9 +1,6 @@
 package com.heroku.spacey.services.impl;
 
-import com.heroku.spacey.dao.OrderDao;
-import com.heroku.spacey.dao.ProductDao;
-import com.heroku.spacey.dao.EmployeeDao;
-import com.heroku.spacey.dao.OrderStatusDao;
+import com.heroku.spacey.dao.*;
 import com.heroku.spacey.entity.Size;
 import com.heroku.spacey.entity.Product;
 import com.heroku.spacey.entity.OrderStatus;
@@ -22,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.webjars.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.security.SecureRandom;
 import java.security.NoSuchAlgorithmException;
@@ -30,9 +28,6 @@ import java.sql.SQLException;
 import java.util.Set;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 @Slf4j
 @Service
@@ -40,24 +35,24 @@ import java.util.concurrent.ScheduledExecutorService;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderDao orderDao;
-    private final OrderStatusDao orderStatusDao;
     private final ProductDao productDao;
     private final EmployeeDao employeeDao;
+    private final OrderStatusDao orderStatusDao;
+    private final OrderDetailsDao orderDetailsDao;
     private final CartService cartService;
     private final SecurityUtils securityUtils;
-
-    private Long orderId;
+    private final ThreadPoolTaskScheduler taskScheduler;
 
 
     @Override
     @Transactional
     public void createOrderForAuthorizedUser(CreateOrderDto order, boolean isAfterAuction)
             throws IllegalArgumentException,
-            SQLException,
-            NoSuchAlgorithmException {
-        createOrder(order, isAfterAuction);
+                   SQLException,
+                   NoSuchAlgorithmException {
 
-        addUserToOrders();
+        createOrder(order, isAfterAuction);
+        addUserToOrders(order);
         cartService.cleanCart();
     }
 
@@ -79,10 +74,12 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Timestamp orderTime = new Timestamp(System.currentTimeMillis());
+        // TODO: change
         Timestamp dateDelivery = new Timestamp(System.currentTimeMillis());
         order.setDateCreate(orderTime);
         order.setDateDelivery(dateDelivery);
-        orderId = orderDao.insert(order);
+        Long orderId = orderDao.insert(order);
+        order.setOrderId(orderId);
 
         addProductsToOrder(order);
         Random rand = SecureRandom.getInstanceStrong();
@@ -148,13 +145,13 @@ public class OrderServiceImpl implements OrderService {
         for (ProductCreateOrderDto product : order.getProducts()) {
             int amount = product.getAmount();
             float sum = product.getSum();
-            orderDao.addProductToOrder(orderId, product.getProductId(), product.getSizeId(), amount, sum);
+            orderDao.addProductToOrder(order.getOrderId(), product.getProductId(), product.getSizeId(), amount, sum);
         }
     }
 
-    private void addUserToOrders() {
+    private void addUserToOrders(CreateOrderDto order) {
         Long userId = securityUtils.getUserIdByToken();
-        orderDao.addUserToOrders(orderId, userId);
+        orderDao.addUserToOrders(order.getOrderId(), userId);
     }
 
     private void assignCourier(CreateOrderDto order, Random rand) throws SQLException {
@@ -168,15 +165,19 @@ public class OrderServiceImpl implements OrderService {
         int selectedCourierIndex = rand.nextInt(availableCouriers.size());
 
         EmployeeDto selectedCourier = availableCouriers.get(selectedCourierIndex);
-        orderDao.addUserToOrders(orderId, selectedCourier.getUserId());
+        orderDao.addUserToOrders(order.getOrderId(), selectedCourier.getUserId());
     }
 
     private void scheduleOrderStatusChange(CreateOrderDto order) {
-        ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+        // TODO: remove magic numbers
         long timeToStatusChange = order.getDateDelivery().getTime() - 3_600_000 - System.currentTimeMillis();
+
         if (timeToStatusChange <= 0) {
             timeToStatusChange = 1000;
         }
-        service.schedule(new OrderStatusChangerTask(order, orderStatusDao), timeToStatusChange, TimeUnit.MILLISECONDS);
+
+        taskScheduler.scheduleAtFixedRate(
+                new OrderStatusChangerTask(order.getOrderId(), orderStatusDao, orderDetailsDao),
+                timeToStatusChange);
     }
 }

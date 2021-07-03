@@ -5,13 +5,14 @@ import com.heroku.spacey.dao.common.EmployeeQueryAdapter;
 import com.heroku.spacey.mapper.EmployeeMapper;
 import com.heroku.spacey.dto.employee.EmployeeDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.webjars.NotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -75,6 +76,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
     }
 
     @Override
+    @Transactional
     public Long insert(EmployeeDto employeeDto) {
         KeyHolder holder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {

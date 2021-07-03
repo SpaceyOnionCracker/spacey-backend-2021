@@ -1,17 +1,17 @@
 package com.heroku.spacey.utils;
 
 import com.heroku.spacey.dao.OrderStatusDao;
-import com.heroku.spacey.dto.order.CreateOrderDto;
+import com.heroku.spacey.dao.OrderDetailsDao;
+import com.heroku.spacey.dto.order.OrderStatusDto;
 import com.heroku.spacey.entity.OrderStatus;
-import lombok.Data;
 import lombok.AllArgsConstructor;
 import org.webjars.NotFoundException;
 
-@Data
 @AllArgsConstructor
 public class OrderStatusChangerTask implements Runnable {
-    private CreateOrderDto createOrderDto;
+    private Long orderId;
     private OrderStatusDao orderStatusDao;
+    private OrderDetailsDao orderDetailsDao;
 
     @Override
     public void run() {
@@ -25,6 +25,9 @@ public class OrderStatusChangerTask implements Runnable {
             orderStatusId = orderStatusDao.insert(orderStatus);
         }
 
-        createOrderDto.setOrderStatusId(orderStatusId);
+        OrderStatusDto orderStatusDto = new OrderStatusDto();
+        orderStatusDto.setOrderId(orderId);
+        orderStatusDto.setOrderStatusId(orderStatusId);
+        orderDetailsDao.updateOrderStatus(orderStatusDto);
     }
 }
