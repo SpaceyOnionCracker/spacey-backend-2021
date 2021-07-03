@@ -37,9 +37,9 @@ public class OrderDetailsDaoImpl implements OrderDetailsDao {
     private String sqlSetOrderStatus;
 
     @Override
-    public OrderDetailsDto getOrderDetails(Long orderId) {
+    public OrderDetailsDto getOrderDetails(Long orderId, Long userId) {
         OrderDetailsMapper mapper = new OrderDetailsMapper(getAllProductInOrder(orderId));
-        return jdbcTemplate.query(sqlGetOrderDetails, mapper, orderId);
+        return jdbcTemplate.query(sqlGetOrderDetails, mapper, orderId, userId);
     }
 
     public List<ProductOrderDto> getAllProductInOrder(Long orderId) {
