@@ -18,4 +18,6 @@ public interface AuctionDao {
     void update(Auction auction);
 
     void delete(Long id);
+
+    void updateBid(Auction auction);
 }
