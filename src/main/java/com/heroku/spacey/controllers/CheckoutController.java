@@ -31,7 +31,7 @@ public class CheckoutController {
     }
 
     @Secured("ROLE_USER")
-    @GetMapping("/timeslots")
+    @PostMapping("/timeslots")
     public List<Timestamp> getAvailableTimeSlots(@RequestBody TimeSlotDate date) {
         return checkoutService.getAvailableTimeslots(date);
     }
