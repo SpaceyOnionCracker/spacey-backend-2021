@@ -53,10 +53,6 @@ public class AuctionServiceImpl implements AuctionService {
         Long sizeId = auctionDto.getProductSize().getId();
         auction.setSizeId(sizeId);
 
-        if (auctionDto.getProductSize().getQuantity() < auctionDto.getAmount()) {
-            throw new NotFoundException("Auction amount is bigger than amount on warehouse");
-        }
-
         return auctionDao.insert(auction);
     }
 

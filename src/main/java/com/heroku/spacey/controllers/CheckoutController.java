@@ -1,11 +1,14 @@
 package com.heroku.spacey.controllers;
 
 import com.heroku.spacey.dto.order.CheckoutDto;
-import com.heroku.spacey.entity.Timeslots;
+import com.heroku.spacey.entity.TimeSlotDate;
 import com.heroku.spacey.services.CheckoutService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.annotation.Secured;
+
+import java.sql.Timestamp;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,7 +32,7 @@ public class CheckoutController {
 
     @Secured("ROLE_USER")
     @GetMapping("/timeslots")
-    public Timeslots getAvailableTimeSlots(@RequestBody Timeslots date) {
+    public List<Timestamp> getAvailableTimeSlots(@RequestBody TimeSlotDate date) {
         return checkoutService.getAvailableTimeslots(date);
     }
 }
