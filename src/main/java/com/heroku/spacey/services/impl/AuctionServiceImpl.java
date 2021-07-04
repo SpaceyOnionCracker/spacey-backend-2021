@@ -86,9 +86,11 @@ public class AuctionServiceImpl implements AuctionService {
         int i = auction.getAuctionType() == Boolean.TRUE ? 1 : -1;
         boolean isPriceStepCorrect;
         if (auction.getBuyPrice() != 0) {
-            isPriceStepCorrect = i * bid - i * auction.getBuyPrice() >= auction.getPriceStep();
+            isPriceStepCorrect = i * bid - i * auction.getBuyPrice() >= auction.getPriceStep()
+                    && bid >= auction.getEndPrice();
         } else {
-            isPriceStepCorrect = i * bid - i * auction.getStartPrice() >= auction.getPriceStep();
+            isPriceStepCorrect = i * bid - i * auction.getStartPrice() >= auction.getPriceStep()
+                    && bid >= auction.getEndPrice();
         }
         if (!isPriceStepCorrect) {
             throw new IllegalArgumentException("Incorrect bid");
