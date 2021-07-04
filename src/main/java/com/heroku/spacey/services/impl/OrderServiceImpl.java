@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.webjars.NotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -44,6 +45,11 @@ public class OrderServiceImpl implements OrderService {
     private final CartService cartService;
     private final SecurityUtils securityUtils;
     private final ThreadPoolTaskScheduler taskScheduler;
+
+    @Value("${dndMessage}")
+    private String dndMessage;
+    @Value("${noContactMessage}")
+    private String noContactMessage;
 
 
     @Override
@@ -91,10 +97,10 @@ public class OrderServiceImpl implements OrderService {
     private void setOrderComment(CreateOrderDto order) {
         StringBuilder commentOptions = new StringBuilder(order.getCommentOrder());
         if (order.isDoNotDisturb()) {
-            commentOptions.append("${dndMessage}");
+            commentOptions.append(dndMessage);
         }
         if (order.isNoContact()) {
-            commentOptions.append("${noContactMessage}");
+            commentOptions.append(noContactMessage);
         }
         order.setCommentOrder(commentOptions.toString());
     }

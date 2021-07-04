@@ -14,9 +14,9 @@ public class ProductCheckoutMapper implements RowMapper<ProductCheckoutDto> {
     public ProductCheckoutDto mapRow(ResultSet rs, int rowNum) throws SQLException {
         ProductCheckoutDto productCheckoutDto = new ProductCheckoutDto();
 
-        productCheckoutDto.setProductName(rs.getString("productname"));
+        productCheckoutDto.setProductId(rs.getLong("productid"));
         productCheckoutDto.setColor(rs.getString("color"));
-        productCheckoutDto.setSizeName(rs.getString("sizename"));
+        productCheckoutDto.setSizeId(rs.getLong("sizeid"));
         productCheckoutDto.setPhoto(rs.getString("photo"));
         productCheckoutDto.setAmount(rs.getInt("amount"));
         productCheckoutDto.setSum(rs.getFloat("sum"));

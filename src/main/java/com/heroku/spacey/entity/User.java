@@ -50,6 +50,6 @@ public class User implements UserDetails, Serializable {
 
     @Override
     public boolean isEnabled() {
-        return statusId == Status.ACTIVATED.getValue();
+        return (statusId != Status.UNACTIVATED.getValue()) && (statusId != Status.TERMINATED.getValue());
     }
 }
