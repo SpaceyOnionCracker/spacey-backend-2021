@@ -41,7 +41,7 @@ public class AuctionController {
     @PutMapping("/edit/{id}")
     @Secured("ROLE_PRODUCT_MANAGER")
     public HttpStatus editAuction(@RequestBody AuctionDto auctionDto,
-                                   @PathVariable Long id) {
+                                  @PathVariable Long id) {
         AuctionDto auction = auctionService.getById(id);
         auctionService.update(auctionDto, auction.getAuctionId());
         return HttpStatus.OK;

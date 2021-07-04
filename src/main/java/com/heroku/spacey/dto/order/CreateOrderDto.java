@@ -9,6 +9,8 @@ import java.sql.Timestamp;
 
 @Data
 public class CreateOrderDto {
+    private Long orderId;
+
     private List<ProductCreateOrderDto> products;
 
     private Long orderStatusId;

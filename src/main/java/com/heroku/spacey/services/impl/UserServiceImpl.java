@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String generateAuthenticationToken(User user) {
         if (statusDao.getStatusName(user.getStatusId()).equals(Status.UNACTIVATED.name())) {
-            throw new UserNotActivatedException("v kmv ");
+            throw new UserNotActivatedException("User is not activated!");
         }
         return jwtTokenProvider.generateToken(user);
     }
