@@ -9,9 +9,9 @@ import java.sql.SQLException;
 public class StatusMapper implements RowMapper<Status> {
     @Override
     public Status mapRow(ResultSet resultSet, int i) throws SQLException {
-        Status role = new Status();
-        role.setId(resultSet.getLong("statusid"));
-        role.setStatusName(resultSet.getString("statusname"));
-        return role;
+        Status status = new Status();
+        status.setId(resultSet.getLong("statusid"));
+        status.setStatusName(resultSet.getString("statusname"));
+        return status;
     }
 }
