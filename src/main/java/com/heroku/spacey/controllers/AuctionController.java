@@ -55,7 +55,7 @@ public class AuctionController {
         return HttpStatus.ACCEPTED;
     }
 
-    @PostMapping("/update-bid/{id}")
+    @PutMapping("/update-bid/{id}")
     @Secured("ROLE_USER")
     public HttpStatus updateAuctionBid(@PathVariable Long id,
                                        @RequestParam Double bid) {
