@@ -83,7 +83,12 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     public void updateBid(AuctionDto auctionDto, Double bid) {
         Auction auction = auctionConvertor.adapt(auctionDto);
-        int i = auction.getAuctionType() == Boolean.TRUE ? 1 : -1;
+        int i;
+        if (auction.getAuctionType() == Boolean.TRUE) {
+            i = 1;
+        } else {
+            i = -1;
+        }
         boolean isPriceStepCorrect;
         if (auction.getBuyPrice() != 0) {
             isPriceStepCorrect = i * bid - i * auction.getBuyPrice() >= auction.getPriceStep()
