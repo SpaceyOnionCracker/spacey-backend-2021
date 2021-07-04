@@ -4,27 +4,27 @@ import lombok.RequiredArgsConstructor;
 import com.heroku.spacey.dao.OrderStatusDao;
 import com.heroku.spacey.entity.OrderStatus;
 import com.heroku.spacey.mapper.OrderStatusMapper;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
 
 import java.sql.Statement;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.ArrayList;
 
 @Repository
 @RequiredArgsConstructor
-
 @PropertySource("classpath:sql/order_status_queries.properties")
 public class OrderStatusDaoImpl implements OrderStatusDao {
 
-    private final OrderStatusMapper mapper = new OrderStatusMapper();
+    private final OrderStatusMapper mapper;
     private final JdbcTemplate jdbcTemplate;
 
     @Value("${select_order_statuses}")
@@ -57,7 +57,6 @@ public class OrderStatusDaoImpl implements OrderStatusDao {
         List<OrderStatus> orderStatuses = Objects.requireNonNull(jdbcTemplate).query(sqlSelectOrderStatusById,
                                                                                      mapper,
                                                                                      orderStatusId);
-
         if (orderStatuses.isEmpty()) {
             throw new NotFoundException("Haven't found order status with such ID.");
         }
@@ -70,7 +69,6 @@ public class OrderStatusDaoImpl implements OrderStatusDao {
         List<OrderStatus> orderStatuses = Objects.requireNonNull(jdbcTemplate).query(sqlSelectOrderStatusByName,
                                                                                      mapper,
                                                                                      status);
-
         if (orderStatuses.isEmpty()) {
             throw new NotFoundException("Haven't found order status with such name.");
         }
@@ -79,6 +77,7 @@ public class OrderStatusDaoImpl implements OrderStatusDao {
     }
 
     @Override
+    @Transactional
     public Long insert(OrderStatus orderStatus) {
         KeyHolder holder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {

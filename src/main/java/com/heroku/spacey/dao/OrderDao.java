@@ -14,5 +14,5 @@ public interface OrderDao {
 
     void addUserToOrders(Long orderId, Long userId);
 
-    List<CourierOrdersDto> getCourierOrders(Long orderId, Date date);
+    List<CourierOrdersDto> getCourierOrders(Long userId, Date date);
 }

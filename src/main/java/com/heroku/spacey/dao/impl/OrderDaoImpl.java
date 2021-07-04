@@ -35,7 +35,7 @@ public class OrderDaoImpl implements OrderDao {
     @Value("${add_user_to_orders}")
     private String sqlInsertUserToOrders;
     @Value("${get_courier_orders}")
-    private String getCourierOrders;
+    private String sqlGetCourierOrders;
 
 
     @Override
@@ -74,10 +74,10 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public List<CourierOrdersDto> getCourierOrders(Long orderId, Date date) {
+    public List<CourierOrdersDto> getCourierOrders(Long userId, Date date) {
         LocalDateTime startOfDay = date.toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1);
 
-        return jdbcTemplate.query(getCourierOrders, courierOrdersMapper, orderId, startOfDay, endOfDay);
+        return jdbcTemplate.query(sqlGetCourierOrders, courierOrdersMapper, userId, startOfDay, endOfDay);
     }
 }
