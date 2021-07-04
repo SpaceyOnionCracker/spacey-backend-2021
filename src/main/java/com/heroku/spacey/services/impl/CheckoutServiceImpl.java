@@ -11,17 +11,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CheckoutServiceImpl implements CheckoutService {
+
+    private static final long ONE_HOUR = 3_600_000;
+    private static final long TEN_HOURS = 36_000_000;
+    private static final long SEVENTEEN_HOURS = 61_200_000;
 
     private final CheckoutDao checkoutDao;
     private final SecurityUtils securityUtils;
@@ -46,16 +47,12 @@ public class CheckoutServiceImpl implements CheckoutService {
     }
 
     @Override
-    public List<Timestamp> getAvailableTimeslots(Timeslots timeslots) {
+    public Timeslots getAvailableTimeslots(Timeslots timeslots) {
         Date date = timeslots.getDate();
-        List<Timestamp> timeSlotsList = new ArrayList<>();
+        List<Timestamp> workingHours = getWorkingHours(date);
         List<Timestamp> availableTimeslots = new ArrayList<>();
 
-        for (long i = date.getTime() + 36_000_000; i <= date.getTime() + 64_800_000; i += 3_600_000) {
-            timeSlotsList.add(new Timestamp(i));
-        }
-
-        for (Timestamp timeSlot : timeSlotsList) {
+        for (Timestamp timeSlot : workingHours) {
             Timestamp timestamp = new Timestamp(date.getTime() + timeSlot.getTime());
             Long activeCouriers = checkoutDao.countActiveCouriers();
             Long orders = checkoutDao.countOrdersForTimeSlot(timestamp);
@@ -63,6 +60,17 @@ public class CheckoutServiceImpl implements CheckoutService {
                 availableTimeslots.add(timeSlot);
             }
         }
-        return availableTimeslots;
+        timeslots.getTimeSlots().addAll(availableTimeslots);
+        return timeslots;
+    }
+
+    private List<Timestamp> getWorkingHours(Date date) {
+        List<Timestamp> workingHours = new ArrayList<>();
+
+        for (long i = date.getTime() + TEN_HOURS; i <= date.getTime() + SEVENTEEN_HOURS; i += ONE_HOUR) {
+            workingHours.add(new Timestamp(i));
+        }
+
+        return workingHours;
     }
 }

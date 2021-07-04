@@ -34,7 +34,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    private static final long ONE_HOUR_IN_MILLISECONDS = 3_600_000;
+    private static final long ONE_HOUR = 3_600_000;
 
     private final OrderDao orderDao;
     private final ProductDao productDao;
@@ -76,8 +76,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Timestamp orderTime = new Timestamp(System.currentTimeMillis());
-        // TODO: change
-        Timestamp dateDelivery = new Timestamp(System.currentTimeMillis());
+        Timestamp dateDelivery = order.getDateDelivery();
         order.setDateCreate(orderTime);
         order.setDateDelivery(dateDelivery);
         Long orderId = orderDao.insert(order);
@@ -171,9 +170,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void scheduleOrderStatusChange(CreateOrderDto order) {
-        long timeToStatusChange = order.getDateDelivery().getTime()
-                                  - ONE_HOUR_IN_MILLISECONDS
-                                  - System.currentTimeMillis();
+        long timeToStatusChange = order.getDateDelivery().getTime() - ONE_HOUR - System.currentTimeMillis();
 
         if (timeToStatusChange <= 0) {
             timeToStatusChange = 1;
