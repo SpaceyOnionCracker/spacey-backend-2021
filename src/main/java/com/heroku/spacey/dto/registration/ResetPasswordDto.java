@@ -5,8 +5,6 @@ import lombok.Data;
 
 @Data
 public class ResetPasswordDto {
-    private String email;
-
     @PasswordConstraint
     private String password;
 
