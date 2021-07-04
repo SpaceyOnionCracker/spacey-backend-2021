@@ -3,7 +3,7 @@ package com.heroku.spacey.services.impl;
 import com.heroku.spacey.dao.CheckoutDao;
 import com.heroku.spacey.dto.order.CheckoutDto;
 import com.heroku.spacey.dto.product.ProductCheckoutDto;
-import com.heroku.spacey.entity.Timeslots;
+import com.heroku.spacey.entity.TimeSlotDate;
 import com.heroku.spacey.services.CheckoutService;
 import com.heroku.spacey.utils.security.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +47,8 @@ public class CheckoutServiceImpl implements CheckoutService {
     }
 
     @Override
-    public Timeslots getAvailableTimeslots(Timeslots timeslots) {
-        Date date = timeslots.getDate();
+    public List<Timestamp> getAvailableTimeslots(TimeSlotDate timeSlotDate) {
+        Date date = timeSlotDate.getDate();
         List<Timestamp> workingHours = getWorkingHours(date);
         List<Timestamp> availableTimeslots = new ArrayList<>();
 
@@ -60,8 +60,8 @@ public class CheckoutServiceImpl implements CheckoutService {
                 availableTimeslots.add(timeSlot);
             }
         }
-        timeslots.getTimeSlots().addAll(availableTimeslots);
-        return timeslots;
+
+        return availableTimeslots;
     }
 
     private List<Timestamp> getWorkingHours(Date date) {

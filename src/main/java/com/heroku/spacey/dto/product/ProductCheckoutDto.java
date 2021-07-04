@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class ProductCheckoutDto {
-    private String productName;
+    private Long productId;
     private String color;
-    private String sizeName;
+    private Long sizeId;
     private String photo;
 
     private int amount;

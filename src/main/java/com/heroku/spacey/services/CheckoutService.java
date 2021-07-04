@@ -1,7 +1,10 @@
 package com.heroku.spacey.services;
 
 import com.heroku.spacey.dto.order.CheckoutDto;
-import com.heroku.spacey.entity.Timeslots;
+import com.heroku.spacey.entity.TimeSlotDate;
+
+import java.sql.Timestamp;
+import java.util.List;
 
 public interface CheckoutService {
 
@@ -9,5 +12,5 @@ public interface CheckoutService {
 
     CheckoutDto getAuctionCheckout(Long auctionId);
 
-    Timeslots getAvailableTimeslots(Timeslots timeslots);
+    List<Timestamp> getAvailableTimeslots(TimeSlotDate timeSlotDate);
 }
