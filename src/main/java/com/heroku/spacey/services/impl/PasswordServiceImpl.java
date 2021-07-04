@@ -57,7 +57,7 @@ public class PasswordServiceImpl implements PasswordService {
         if (!passwordConformity(resetPasswordDto.getPassword(), resetPasswordDto.getPasswordRepeat())) {
             throw new InputMismatchException("Passwords mismatch");
         }
-        if (!resetPasswordMatchOldPassword(resetPasswordDto.getPassword(), user.getPassword())) {
+        if (resetPasswordMatchOldPassword(resetPasswordDto.getPassword(), user.getPassword())) {
             throw new InputMismatchException("New password match old password");
         }
         changeUserPassword(user, resetPasswordDto.getPassword());
