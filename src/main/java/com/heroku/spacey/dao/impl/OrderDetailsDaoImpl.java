@@ -8,6 +8,7 @@ import com.heroku.spacey.mapper.order.OrderDetailsMapper;
 import com.heroku.spacey.mapper.order.ProductsInOrderMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 @PropertySource("classpath:sql/order_details_queries.properties")
@@ -23,6 +25,8 @@ public class OrderDetailsDaoImpl implements OrderDetailsDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final ProductsInOrderMapper productsInOrderMapper;
+    private final String deliveredStatus = "DELIVERED";
+    private final String failStatus = "FAIL";
 
     @Value("${select_details_by_order_id}")
     private String sqlGetOrderDetails;
@@ -36,6 +40,9 @@ public class OrderDetailsDaoImpl implements OrderDetailsDao {
     @Value("${set_order_status}")
     private String sqlSetOrderStatus;
 
+    @Value("${select_order_status}")
+    private String sqlSelectOrderStatus;
+
     @Override
     public OrderDetailsDto getOrderDetails(Long orderId, Long userId) {
         OrderDetailsMapper mapper = new OrderDetailsMapper(getAllProductInOrder(orderId));
@@ -48,6 +55,10 @@ public class OrderDetailsDaoImpl implements OrderDetailsDao {
 
     @Override
     public void updateOrderStatus(OrderStatusDto orderStatusDto) {
+        String orderStatus = jdbcTemplate.queryForObject(sqlSelectOrderStatus, String.class, orderStatusDto.getOrderId());
+        if (orderStatus.equals(deliveredStatus) || orderStatus.equals(failStatus)) {
+            throw new IllegalArgumentException("The status was changed earlier");
+        }
         Objects.requireNonNull(jdbcTemplate).update(
                 sqlChangeOrderStatus,
                 orderStatusDto.getOrderStatusId(),
@@ -57,13 +68,23 @@ public class OrderDetailsDaoImpl implements OrderDetailsDao {
 
     @Override
     public void setDeliveredStatus(Long orderId) {
-        String deliveredStatus = "DELIVERED";
-        jdbcTemplate.update(sqlSetOrderStatus, deliveredStatus, orderId);
+        String orderStatus = jdbcTemplate.queryForObject(sqlSelectOrderStatus, String.class, orderId);
+        if (orderStatus.equals(deliveredStatus) || orderStatus.equals(failStatus)) {
+            throw new IllegalArgumentException("The status was changed earlier");
+        } else {
+            jdbcTemplate.update(sqlSetOrderStatus, deliveredStatus, orderId);
+        }
+
     }
 
     @Override
     public void setFailStatus(Long orderId) {
-        String failStatus = "FAIL";
-        jdbcTemplate.update(sqlSetOrderStatus, failStatus, orderId);
+        String orderStatus = jdbcTemplate.queryForObject(sqlSelectOrderStatus, String.class, orderId);
+        if (orderStatus.equals(deliveredStatus) || orderStatus.equals(failStatus)) {
+            throw new IllegalArgumentException("The status was changed earlier");
+        } else {
+            jdbcTemplate.update(sqlSetOrderStatus, failStatus, orderId);
+        }
+
     }
 }
