@@ -35,7 +35,7 @@ public class OrderDaoImpl implements OrderDao {
     @Value("${add_user_to_orders}")
     private String sqlInsertUserToOrders;
     @Value("${get_courier_orders}")
-    private String getCourierOrders;
+    private String sqlGetCourierOrders;
 
 
     @Override
@@ -78,6 +78,6 @@ public class OrderDaoImpl implements OrderDao {
         LocalDateTime startOfDay = date.toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1);
 
-        return jdbcTemplate.query(getCourierOrders, courierOrdersMapper, userId, startOfDay, endOfDay);
+        return jdbcTemplate.query(sqlGetCourierOrders, courierOrdersMapper, userId, startOfDay, endOfDay);
     }
 }

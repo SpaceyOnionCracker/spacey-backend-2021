@@ -7,18 +7,23 @@ import com.heroku.spacey.mapper.order.CheckoutMapper;
 import com.heroku.spacey.mapper.order.CheckoutInfoMapper;
 import com.heroku.spacey.mapper.order.ProductCheckoutMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.PropertySources;
 import org.webjars.NotFoundException;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
-@PropertySource("classpath:sql/checkout_queries.properties")
+@PropertySources({
+        @PropertySource("classpath:sql/checkout_queries.properties"),
+        @PropertySource("classpath:sql/employee_queries.properties")
+})
 public class CheckoutDaoImpl implements CheckoutDao {
 
     private final CheckoutMapper checkoutMapper;
@@ -32,6 +37,10 @@ public class CheckoutDaoImpl implements CheckoutDao {
     private String sqlSelectCheckoutInfoByUserId;
     @Value("${select_auction_checkout_by_auction_id}")
     private String sqlSelectAuctionCheckoutByAuctionId;
+    @Value("${select_orders_number_for_timeslot}")
+    private String sqlSelectOrdersNumberForTimeslot;
+    @Value("${select_active_couriers_number}")
+    private String sqlSelectActiveCouriersNumber;
 
 
     @Override
@@ -64,5 +73,15 @@ public class CheckoutDaoImpl implements CheckoutDao {
         }
 
         return checkoutDtos.get(0);
+    }
+
+    @Override
+    public Long countActiveCouriers() {
+        return jdbcTemplate.queryForObject(sqlSelectActiveCouriersNumber, Long.class);
+    }
+
+    @Override
+    public Long countOrdersForTimeSlot(Timestamp timeSlot) {
+        return jdbcTemplate.queryForObject(sqlSelectOrdersNumberForTimeslot, Long.class, timeSlot);
     }
 }
