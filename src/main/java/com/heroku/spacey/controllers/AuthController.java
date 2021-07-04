@@ -20,6 +20,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,15 +70,15 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Void> userRegistration(@RequestBody @Validated UserRegisterDto registerDto) {
         EmailComposer emailComposer = new EmailComposer(
-            confirmRegistrationUrl,
-            confirmRegistrationSubject,
-            confirmRegistrationEndpoint,
-            confirmRegistrationTemplate);
+                confirmRegistrationUrl,
+                confirmRegistrationSubject,
+                confirmRegistrationEndpoint,
+                confirmRegistrationTemplate);
         if (userService.userExists(registerDto.getEmail())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(userService.registerUser(registerDto),
-            emailComposer));
+                emailComposer));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -85,9 +86,9 @@ public class AuthController {
     public ResponseEntity<UserTokenDto> login(@RequestBody LoginDto loginDto) {
         UserTokenDto response = userService.authenticate(loginDto.getEmail(), loginDto.getPassword());
         return ResponseEntity
-            .ok()
-            .header(HttpHeaders.AUTHORIZATION, response.getAuthToken())
-            .body(response);
+                .ok()
+                .header(HttpHeaders.AUTHORIZATION, response.getAuthToken())
+                .body(response);
     }
 
     @GetMapping("/registration_confirm")
@@ -102,23 +103,23 @@ public class AuthController {
         Token newToken = tokenService.generateNewVerificationToken(user, existingToken);
         String token = newToken.getToken();
         EmailComposer emailComposer = new EmailComposer(
-            resendRegistrationUrl,
-            resendRegistrationSubject,
-            resendRegistrationEndpoint,
-            resendRegistrationTemplate);
+                resendRegistrationUrl,
+                resendRegistrationSubject,
+                resendRegistrationEndpoint,
+                resendRegistrationTemplate);
         String recipient = user.getEmail();
         emailService.sendSimpleMessageWithTemplate(recipient, emailComposer.getSubject(),
-            emailComposer.composeUri(token), emailComposer.getTemplate());
+                emailComposer.composeUri(token), emailComposer.getTemplate());
         return HttpStatus.OK;
     }
 
     @PostMapping("/reset-password")
     public HttpStatus resetPassword(@RequestParam("email") String userEmail) {
         EmailComposer emailComposer = new EmailComposer(
-            resetPasswordUrl,
-            resetPasswordSubject,
-            resetPasswordEndpoint,
-            resetPasswordTemplate);
+                resetPasswordUrl,
+                resetPasswordSubject,
+                resetPasswordEndpoint,
+                resetPasswordTemplate);
         User user = userService.getUserByEmail(userEmail);
         if (user == null) {
             throw new UserNotFoundException("User email not found!");
@@ -141,14 +142,15 @@ public class AuthController {
     public HttpStatus showCreatePasswordPage(@RequestParam("token") String token) throws TimeoutException {
         String tokenValidation = passwordService.validatePasswordResetToken(token);
         if (tokenValidation == null) {
-            throw new com.amazonaws.services.apigateway.model.NotFoundException("User token is incorrect!");
+            throw new NotFoundException("User token is incorrect!");
         }
         return HttpStatus.OK;
     }
 
     @PostMapping("/reset-password-save")
-    public HttpStatus saveResetPassword(@RequestBody @Validated ResetPasswordDto resetPasswordDto) {
-        User user = userService.getUserByEmail(resetPasswordDto.getEmail());
+    public HttpStatus saveResetPassword(@RequestParam("token") String token,
+                                        @RequestBody @Validated ResetPasswordDto resetPasswordDto) {
+        User user = userService.getUserByToken(token);
         if (user == null) {
             throw new NotFoundException("User not found!");
         }
@@ -157,27 +159,25 @@ public class AuthController {
     }
 
     @PostMapping("/create-password-save")
-    public HttpStatus saveCreatePassword(@RequestBody @Validated ResetPasswordDto resetPasswordDto) {
-        User user = userService.getUserByEmail(resetPasswordDto.getEmail());
+    public HttpStatus saveCreatePassword(@RequestParam("token") String token,
+                                         @RequestBody @Validated ResetPasswordDto resetPasswordDto) {
+        User user = userService.getUserByToken(token);
         if (user == null) {
-            throw new com.amazonaws.services.apigateway.model.NotFoundException("Employee not found!");
+            throw new NotFoundException("Employee not found!");
         }
         passwordService.saveCreatePassword(user, resetPasswordDto);
         employeeService.activateEmployee(user);
-
         return HttpStatus.OK;
     }
 
     @PostMapping("/change-password-save")
+    @Secured({"ROLE_USER", "ROLE_COURIER", "ROLE_PRODUCT_MANAGER", "ROLE_ADMIN"})
     public HttpStatus saveChangePassword(@RequestBody @Validated PasswordDto passwordDto) {
-        User user = userService.getUserByEmail(passwordDto.getEmail());
+        User user = passwordService.getCurrentUser();
         if (user == null) {
             throw new NotFoundException("User not found!");
         }
-        if (!passwordService.passwordConformity(passwordDto.getNewPassword(), passwordDto.getNewPasswordRepeat())) {
-            return HttpStatus.BAD_REQUEST;
-        }
-        passwordService.changeUserPassword(user, passwordDto.getNewPassword());
+        passwordService.saveChangePassword(user, passwordDto);
         return HttpStatus.OK;
     }
 }
