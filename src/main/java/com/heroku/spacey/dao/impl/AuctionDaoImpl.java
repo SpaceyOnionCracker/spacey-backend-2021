@@ -122,7 +122,7 @@ public class AuctionDaoImpl implements AuctionDao {
     @Override
     public void updateBid(Auction auction) {
         Object[] params = new Object[]{
-                auction.getUserId(), auction.getBuyPrice(), auction.getAuctionId()
+                auction.getUserId(), auction.getBuyPrice(), auction.getEndTime(), auction.getAuctionId()
         };
         Objects.requireNonNull(jdbcTemplate).update(updateAuctionBid, params);
     }
