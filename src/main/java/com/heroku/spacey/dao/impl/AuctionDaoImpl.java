@@ -1,22 +1,22 @@
 package com.heroku.spacey.dao.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import com.heroku.spacey.dao.AuctionDao;
 import com.heroku.spacey.entity.Auction;
-import com.heroku.spacey.mapper.auction.all.AuctionAllMapper;
-import com.heroku.spacey.mapper.auction.by_id.AuctionIdMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.context.annotation.PropertySource;
+import com.heroku.spacey.mapper.auction.all.AuctionAllMapper;
+import com.heroku.spacey.mapper.auction.by_id.AuctionIdMapper;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.sql.PreparedStatement;
 
 @Slf4j
 @Repository
@@ -38,6 +38,8 @@ public class AuctionDaoImpl implements AuctionDao {
     private String editAuction;
     @Value("${update_auction}")
     private String updateAuction;
+    @Value("${update_auction_bid}")
+    private String updateAuctionBid;
     @Value("${delete_auction}")
     private String deleteAuction;
 
@@ -115,5 +117,13 @@ public class AuctionDaoImpl implements AuctionDao {
     @Override
     public void delete(Long id) {
         Objects.requireNonNull(jdbcTemplate).update(deleteAuction, id);
+    }
+
+    @Override
+    public void updateBid(Auction auction) {
+        Object[] params = new Object[]{
+                auction.getUserId(), auction.getBuyPrice(), auction.getAuctionId()
+        };
+        Objects.requireNonNull(jdbcTemplate).update(updateAuctionBid, params);
     }
 }

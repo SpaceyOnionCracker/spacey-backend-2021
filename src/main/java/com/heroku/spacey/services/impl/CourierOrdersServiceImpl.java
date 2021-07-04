@@ -1,10 +1,10 @@
 package com.heroku.spacey.services.impl;
 
 import com.heroku.spacey.dao.OrderDao;
-import com.heroku.spacey.utils.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.heroku.spacey.dto.order.CourierOrdersDto;
+import com.heroku.spacey.utils.security.SecurityUtils;
 import com.heroku.spacey.services.CourierOrdersService;
 
 import java.sql.Date;
