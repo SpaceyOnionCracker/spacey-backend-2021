@@ -27,6 +27,7 @@ public class OrderDetailsDaoImpl implements OrderDetailsDao {
     private final ProductsInOrderMapper productsInOrderMapper;
     private final String deliveredStatus = "DELIVERED";
     private final String failStatus = "FAIL";
+    private final String message = "The status was changed earlier";
 
     @Value("${select_details_by_order_id}")
     private String sqlGetOrderDetails;
@@ -57,7 +58,7 @@ public class OrderDetailsDaoImpl implements OrderDetailsDao {
     public void updateOrderStatus(OrderStatusDto orderStatusDto) {
         String orderStatus = jdbcTemplate.queryForObject(sqlSelectOrderStatus, String.class, orderStatusDto.getOrderId());
         if (orderStatus.equals(deliveredStatus) || orderStatus.equals(failStatus)) {
-            throw new IllegalArgumentException("The status was changed earlier");
+            throw new IllegalArgumentException(message);
         }
         Objects.requireNonNull(jdbcTemplate).update(
                 sqlChangeOrderStatus,
@@ -70,7 +71,7 @@ public class OrderDetailsDaoImpl implements OrderDetailsDao {
     public void setDeliveredStatus(Long orderId) {
         String orderStatus = jdbcTemplate.queryForObject(sqlSelectOrderStatus, String.class, orderId);
         if (orderStatus.equals(deliveredStatus) || orderStatus.equals(failStatus)) {
-            throw new IllegalArgumentException("The status was changed earlier");
+            throw new IllegalArgumentException(message);
         } else {
             jdbcTemplate.update(sqlSetOrderStatus, deliveredStatus, orderId);
         }
@@ -81,7 +82,7 @@ public class OrderDetailsDaoImpl implements OrderDetailsDao {
     public void setFailStatus(Long orderId) {
         String orderStatus = jdbcTemplate.queryForObject(sqlSelectOrderStatus, String.class, orderId);
         if (orderStatus.equals(deliveredStatus) || orderStatus.equals(failStatus)) {
-            throw new IllegalArgumentException("The status was changed earlier");
+            throw new IllegalArgumentException(message);
         } else {
             jdbcTemplate.update(sqlSetOrderStatus, failStatus, orderId);
         }
