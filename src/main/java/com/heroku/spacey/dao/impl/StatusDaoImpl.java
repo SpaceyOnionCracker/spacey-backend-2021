@@ -1,7 +1,6 @@
 package com.heroku.spacey.dao.impl;
 
 import com.heroku.spacey.dao.StatusDao;
-import com.heroku.spacey.entity.Material;
 import com.heroku.spacey.entity.Status;
 import com.heroku.spacey.mapper.StatusMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
