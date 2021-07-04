@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +80,7 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
+    @Transactional
     public void updateBid(AuctionDto auctionDto, Double bid) {
         Auction auction = auctionConvertor.adapt(auctionDto);
         int i;
@@ -96,7 +100,10 @@ public class AuctionServiceImpl implements AuctionService {
         if (!isPriceStepCorrect) {
             throw new IllegalArgumentException("Incorrect bid");
         }
-
+        Duration duration = Duration.between(auction.getEndTime().toLocalDateTime(), LocalDateTime.now());
+        if (Math.abs(duration.toMinutes()) < 30) {
+            auction.setEndTime(Timestamp.valueOf(LocalDateTime.now().plusMinutes(30)));
+        }
         Object principal = SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
         User user = (User) principal;
