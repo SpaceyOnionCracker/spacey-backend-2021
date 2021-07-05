@@ -11,23 +11,19 @@ import java.sql.SQLException;
 public class CheckoutMapper implements RowMapper<CheckoutDto> {
 
     @Override
-    public CheckoutDto mapRow(ResultSet resultSet, int i) throws SQLException {
-        CheckoutDto checkoutDto = new CheckoutDto();
+    public CheckoutDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+        CheckoutDto checkoutInfo = new CheckoutDto();
 
-        checkoutDto.setOverallPrice(resultSet.getFloat("overallprice"));
-        mapDeliveryInfo(resultSet, checkoutDto);
+        checkoutInfo.setFirstName(rs.getString("firstname"));
+        checkoutInfo.setLastName(rs.getString("lastname"));
+        checkoutInfo.setPhoneNumber(rs.getString("phonenumber"));
+        checkoutInfo.setEmail(rs.getString("email"));
+        checkoutInfo.setCity(rs.getString("city"));
+        checkoutInfo.setStreet(rs.getString("street"));
+        checkoutInfo.setHouse(rs.getString("house"));
+        checkoutInfo.setApartment(rs.getString("appartment"));
+        checkoutInfo.setOverallPrice(rs.getFloat("overallprice"));
 
-        return checkoutDto;
-    }
-
-    public static void mapDeliveryInfo(ResultSet resultSet, CheckoutDto checkoutDto) throws SQLException {
-        checkoutDto.setFirstName(resultSet.getString("firstname"));
-        checkoutDto.setLastName(resultSet.getString("lastname"));
-        checkoutDto.setPhoneNumber(resultSet.getString("phonenumber"));
-        checkoutDto.setEmail(resultSet.getString("email"));
-        checkoutDto.setCity(resultSet.getString("city"));
-        checkoutDto.setStreet(resultSet.getString("street"));
-        checkoutDto.setHouse(resultSet.getString("house"));
-        checkoutDto.setApartment(resultSet.getString("appartment"));
+        return checkoutInfo;
     }
 }
