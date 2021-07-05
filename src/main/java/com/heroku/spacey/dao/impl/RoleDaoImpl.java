@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -24,6 +25,9 @@ public class RoleDaoImpl implements RoleDao {
 
     private final JdbcTemplate jdbcTemplate;
     private RoleMapper mapper;
+
+    @Value("${get_employee_roles}")
+    private String getEmployeeRoles;
 
     @Value("${get_role_by_rolename}")
     private String getRoleByRoleName;
@@ -37,6 +41,11 @@ public class RoleDaoImpl implements RoleDao {
     public RoleDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.mapper = new RoleMapper();
+    }
+
+    @Override
+    public List<Role> getEmployeeRoles() {
+        return Objects.requireNonNull(jdbcTemplate).query(getEmployeeRoles, mapper);
     }
 
     @Override

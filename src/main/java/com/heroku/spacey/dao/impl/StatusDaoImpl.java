@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -24,6 +25,9 @@ public class StatusDaoImpl implements StatusDao {
 
     private final JdbcTemplate jdbcTemplate;
     private StatusMapper mapper;
+
+    @Value("${get_all_statuses}")
+    private String getAllStatuses;
 
     @Value("${get_status_by_statusname}")
     private String getStatusByStatusName;
@@ -37,6 +41,11 @@ public class StatusDaoImpl implements StatusDao {
     public StatusDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
         this.mapper = new StatusMapper();
+    }
+
+    @Override
+    public List<Status> getAllStatuses() {
+        return Objects.requireNonNull(jdbcTemplate).query(getAllStatuses, mapper);
     }
 
     @Override
