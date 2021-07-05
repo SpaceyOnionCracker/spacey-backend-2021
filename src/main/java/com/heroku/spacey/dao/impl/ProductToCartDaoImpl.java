@@ -84,7 +84,6 @@ public class ProductToCartDaoImpl implements ProductToCartDao {
         Object[] params = new Object[]{
             productToCart.getAmount(),
             productToCart.getSum(),
-            LocalDateTime.now(),
             productToCart.getCartId(),
             productToCart.getProductId(),
             productToCart.getSizeId()
