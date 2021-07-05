@@ -84,7 +84,7 @@ public class OrderServiceImpl implements OrderService {
         Timestamp orderTime = new Timestamp(System.currentTimeMillis());
         Timestamp dateDelivery = order.getDateDelivery();
         order.setDateCreate(orderTime);
-        order.setDateDelivery(dateDelivery);
+        order.setDateDelivery(new Timestamp(dateDelivery.getTime() + 172_800_000));
         Long orderId = orderDao.insert(order);
         order.setOrderId(orderId);
 
