@@ -1,12 +1,13 @@
 package com.heroku.spacey.controllers;
 
-import com.heroku.spacey.dto.auction.AllAuctionsDto;
-import com.heroku.spacey.dto.auction.AuctionDto;
-import com.heroku.spacey.services.AuctionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
+import com.heroku.spacey.dto.auction.AuctionDto;
+import com.heroku.spacey.services.AuctionService;
 import org.springframework.web.bind.annotation.*;
+import com.heroku.spacey.dto.auction.AuctionBidDto;
+import com.heroku.spacey.dto.auction.AllAuctionsDto;
+import org.springframework.security.access.annotation.Secured;
 
 import java.util.List;
 
@@ -55,12 +56,11 @@ public class AuctionController {
         return HttpStatus.ACCEPTED;
     }
 
-    @PutMapping("/update-bid/{id}")
+    @PutMapping("/update-bid")
     @Secured("ROLE_USER")
-    public HttpStatus updateAuctionBid(@PathVariable Long id,
-                                       @RequestParam Double bid) {
-        AuctionDto auction = auctionService.getById(id);
-        auctionService.updateBid(auction, bid);
+    public HttpStatus updateAuctionBid(@RequestBody AuctionBidDto auctionBidDto) {
+        AuctionDto auction = auctionService.getById(auctionBidDto.getAuctionId());
+        auctionService.updateBid(auction, auctionBidDto.getBuyPrice());
         return HttpStatus.OK;
     }
 }
