@@ -137,7 +137,6 @@ public class AuthController {
         return HttpStatus.OK;
     }
 
-
     @GetMapping("/create-password")
     public HttpStatus showCreatePasswordPage(@RequestParam("token") String token) throws TimeoutException {
         String tokenValidation = passwordService.validatePasswordResetToken(token);
