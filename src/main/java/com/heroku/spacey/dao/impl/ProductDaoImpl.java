@@ -95,7 +95,7 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public boolean isExist(Long id) {
         List<Integer> products = Objects.requireNonNull(jdbcTemplate)
-            .query(isExistProduct, (rs, i) -> rs.getInt("productId"), id);
+                .query(isExistProduct, (rs, i) -> rs.getInt("productId"), id);
         return !products.isEmpty();
     }
 
@@ -150,9 +150,9 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public void update(Product product) {
         Object[] params = new Object[]{
-            product.getColorId(), product.getCategoryId(), product.getName(), product.getProductSex(), product.getPrice(),
-            product.getPhoto(), product.getDescription(), product.getDiscount(),
-            product.getIsAvailable(), product.getId()
+                product.getColorId(), product.getCategoryId(), product.getName(),
+                product.getProductSex(), product.getPrice(), product.getDescription(),
+                product.getDiscount(), product.getIsAvailable(), product.getId()
         };
         Objects.requireNonNull(jdbcTemplate).update(updateProduct, params);
     }
@@ -170,7 +170,7 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public int getAmount(Long sizeId, Long productId) {
         Integer result = DataAccessUtils.singleResult(jdbcTemplate.query(getAmountBySize,
-            SingleColumnRowMapper.newInstance(Integer.class), sizeId, productId));
+                SingleColumnRowMapper.newInstance(Integer.class), sizeId, productId));
         if (result == null) {
             log.error("either size or product does not exist in db");
             throw new NotFoundException("Size not found");
@@ -181,7 +181,7 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public boolean isAvailable(Long productId) {
         Boolean result = DataAccessUtils.singleResult(jdbcTemplate.query(isAvailableById,
-            SingleColumnRowMapper.newInstance(Boolean.class), productId));
+                SingleColumnRowMapper.newInstance(Boolean.class), productId));
         if (result == null) {
             log.error("Product does not exist in db");
             throw new NotFoundException("Product not found");
@@ -192,7 +192,7 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public ProductForUnauthorizedCart getProductByIdAndSize(Long productId, Long sizeId) {
         List<ProductForUnauthorizedCart> list = jdbcTemplate.query(getProductByIdAndSizeId,
-            new ProductForUnauthorizedCartMapper(), sizeId, productId);
+                new ProductForUnauthorizedCartMapper(), sizeId, productId);
         if (list.isEmpty()) {
             return null;
         }
