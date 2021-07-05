@@ -70,10 +70,6 @@ public class OrderDetailsDaoImpl implements OrderDetailsDao {
     @Override
     public void setDeliveredStatus(Long orderId) {
         String orderStatus = jdbcTemplate.queryForObject(sqlSelectOrderStatus, String.class, orderId);
-        log.info(orderId.toString());
-        log.info(sqlSetOrderStatus);
-        log.info(sqlSelectOrderStatus);
-        log.info(orderStatus);
         if (orderStatus.equals(deliveredStatus) || orderStatus.equals(failStatus)) {
             throw new IllegalArgumentException(message);
         } else {
