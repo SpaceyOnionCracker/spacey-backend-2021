@@ -16,15 +16,12 @@ public class AuctionCheckoutMapper implements RowMapper<CheckoutDto> {
         CheckoutDto checkoutDto = new CheckoutDto();
         ProductCheckoutDto product = new ProductCheckoutDto();
 
-        product.setId(rs.getLong("productid"));
-        product.setName(rs.getString("productname"));
+        product.setProductId(rs.getLong("productid"));
         product.setColor(rs.getString("color"));
         product.setSizeId(rs.getLong("sizeid"));
-        product.setSize(rs.getString("sizename"));
         product.setPhoto(rs.getString("photo"));
         product.setAmount(rs.getInt("amount"));
-        product.setDiscount(rs.getFloat("discount"));
-        product.setOverallPrice(rs.getFloat("finalprice"));
+        product.setSum(rs.getFloat("finalprice"));
 
         checkoutDto.getProducts().add(product);
 
