@@ -12,18 +12,19 @@ public class CheckoutMapper implements RowMapper<CheckoutDto> {
 
     @Override
     public CheckoutDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-        CheckoutDto checkoutInfo = new CheckoutDto();
+        CheckoutDto checkoutDto = new CheckoutDto();
 
-        checkoutInfo.setFirstName(rs.getString("firstname"));
-        checkoutInfo.setLastName(rs.getString("lastname"));
-        checkoutInfo.setPhoneNumber(rs.getString("phonenumber"));
-        checkoutInfo.setEmail(rs.getString("email"));
-        checkoutInfo.setCity(rs.getString("city"));
-        checkoutInfo.setStreet(rs.getString("street"));
-        checkoutInfo.setHouse(rs.getString("house"));
-        checkoutInfo.setApartment(rs.getString("appartment"));
-        checkoutInfo.setOverallPrice(rs.getFloat("overallprice"));
+        checkoutDto.setOverallPrice(rs.getFloat("overallprice"));
 
-        return checkoutInfo;
+        checkoutDto.setFirstName(rs.getString("firstname"));
+        checkoutDto.setLastName(rs.getString("lastname"));
+        checkoutDto.setPhoneNumber(rs.getString("phonenumber"));
+        checkoutDto.setEmail(rs.getString("email"));
+        checkoutDto.setCity(rs.getString("city"));
+        checkoutDto.setStreet(rs.getString("street"));
+        checkoutDto.setHouse(rs.getString("house"));
+        checkoutDto.setApartment(rs.getString("appartment"));
+
+        return checkoutDto;
     }
 }
