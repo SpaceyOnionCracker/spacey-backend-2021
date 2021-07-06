@@ -58,24 +58,30 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encodedPassword);
         user.setUserRole(Roles.USER.name());
 
+        user.setRoleId(getUserRoleId());
+        user.setStatusId(getUnactivatedStatusId());
+
+        Long userId = userDao.insert(user);
+        user.setUserId(userId);
+        return user;
+    }
+
+    private Long getUserRoleId() {
         Long roleId = roleDao.getRoleId(Roles.USER.name());
         if (roleId == null) {
             roleId = roleDao.insertRole(Roles.USER.name());
             log.info("role user created with id: " + roleId);
         }
-        user.setRoleId(roleId);
+        return roleId;
+    }
 
+    private Long getUnactivatedStatusId() {
         Long statusId = statusDao.getStatusId(Status.UNACTIVATED.name());
         if (statusId == null) {
             statusId = statusDao.insertStatus(Status.UNACTIVATED.name());
             log.info("status 'unactivated' created with id: " + statusId);
         }
-        user.setStatusId(statusId);
-
-        Long userId = userDao.insert(user);
-        user.setUserId(userId);
-
-        return user;
+        return statusId;
     }
 
     @Override

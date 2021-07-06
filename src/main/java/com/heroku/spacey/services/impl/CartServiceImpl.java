@@ -55,7 +55,7 @@ public class CartServiceImpl implements CartService {
                 throw new NotEnoughProductException("Cannot add product: product out of stock");
             }
             productToCartDao.insert(cart.getCartId(), productId, sizeId, amount, sum);
-            log.info("ProductToCart created");
+            log.debug("ProductToCart created");
         } else {
             int newAmount = productToCart.getAmount() + amount;
             int available = productDao.getAmount(sizeId, productId);
@@ -65,7 +65,7 @@ public class CartServiceImpl implements CartService {
             productToCart.setAmount(newAmount);
             productToCart.setSum(productToCart.getSum() + sum);
             productToCartDao.update(productToCart);
-            log.info("ProductToCart updated");
+            log.debug("ProductToCart updated");
         }
 
         cartDao.updatePrice(cart.getCartId(), cart.getOverallPrice() + sum);
@@ -81,21 +81,26 @@ public class CartServiceImpl implements CartService {
         }
         double sum = amount * (product.getPrice() * ((100 - product.getDiscount()) / 100));
 
-        ProductToCart productToCart = productToCartDao.get(cart.getCartId(), productId, sizeId);
-        if (productToCart == null) {
-            throw new NotFoundException("product to cart doesnt exist");
-        }
+        ProductToCart productToCart = getProductToCart(cart.getCartId(), productId, sizeId);
 
         if (productToCart.getAmount() == amount) {
             productToCartDao.delete(productToCart);
-            log.info("product to cart deleted");
+            log.debug("product to cart deleted");
         } else {
             productToCart.setAmount(productToCart.getAmount() - amount);
             productToCart.setSum(productToCart.getSum() - sum);
             productToCartDao.update(productToCart);
-            log.info("ProductToCart updated");
+            log.debug("ProductToCart updated");
         }
         cartDao.updatePrice(cart.getCartId(), cart.getOverallPrice() - sum);
+    }
+
+    private ProductToCart getProductToCart(Long cartId, Long productId, Long sizeId) {
+        ProductToCart productToCart = productToCartDao.get(cartId, productId, sizeId);
+        if (productToCart == null) {
+            throw new NotFoundException("product to cart doesnt exist");
+        }
+        return productToCart;
     }
 
     @Override
@@ -119,6 +124,7 @@ public class CartServiceImpl implements CartService {
         for (ProductToCart productToCart : list) {
             productToCartDao.delete(productToCart);
         }
+        log.debug("ProductToCart cleaned up");
         cartDao.updatePrice(cart.getCartId(), 0);
     }
 
@@ -135,6 +141,15 @@ public class CartServiceImpl implements CartService {
             ));
         }
         return list;
+    }
+
+
+    private int getUnavailableCount(Long productId, Long sizeId, int amount) {
+        int available = productDao.getAmount(sizeId, productId);
+        if (amount > available) {
+            return amount - available;
+        }
+        return 0;
     }
 
     @Override
@@ -169,11 +184,4 @@ public class CartServiceImpl implements CartService {
         return list;
     }
 
-    private int getUnavailableCount(Long productId, Long sizeId, int amount) {
-        int available = productDao.getAmount(sizeId, productId);
-        if (amount > available) {
-            return amount - available;
-        }
-        return 0;
-    }
 }
